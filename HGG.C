@@ -38,16 +38,19 @@ void cdisc(disco * dis)
 {
     rectangle(dis->x,dis->y,dis->tamx,dis->tamy);
 }
-
+int ccl=1;
 void mover(disco * dis,int dx, int dy)
 {
+    if(ccl>=0xE)
+	ccl=0;
+    ccl++;
     setcolor(0);
     cdisc(dis);
     dis->x+=dx;
     dis->y+=dy;
     dis->tamx+=dx;
     dis->tamy+=dy;
-    setcolor(0xF);
+    setcolor(ccl);
     cdisc(dis);
 }
 
@@ -88,24 +91,79 @@ int verp(stck * o, pals * plll)
 	return 3;
 }
 
+int yp=0;
+int contis(stck * p1)
+{
+     stck * count;
+     int cont=0;
+     count=p1;
+     /*while(count->top!=0)
+     {
+	del(count);
+	cont++;
+     }*/
+     return count->top;
+}
 void movp(disco * hanoi,pals * plll, stck * p1, stck * p2)
 {
-    int elem;
+    int elem,pp1,pp2,cp1,cp2,ap1,ap2,ypp;
+    int yy[]={4,3,-1,2,-1,-1,0,1,1,0,-1,-1,2,-1,-3,0,3,1,-2,1,1,0,-1,-1,0,1,1,-2,1,-3,-4};
+    ap1=contis(p1);
+    ap2=contis(p2);
     elem=del(p1);
     ins(p2,elem);
-    switch(elem)
-    {
-	case 4:
-		if(p1==plll->st1 && p2==plll->st2)
-		{
-			mover(&hanoi[elem],200,32*(5-p2->top));
+    pp1=verp(p1,plll);
+    pp2=verp(p2,plll);
+    cp1=contis(p1);
+    cp2=contis(p2);
+    ypp=32 * yy[yp++];
+		     if(pp1==1 && pp2==2)
+		     {
+		     if(ap1>ap2)
+			mover(&hanoi[elem],200,ypp);
+		     else
+			mover(&hanoi[elem],200,ypp);
 		}
-		mostrarmul(plll->st1,plll->st2,plll->st3);
-		break;
+		else if ( pp1==1 && pp2==3)
+		{
+		     if(ap1>ap2)
+			mover(&hanoi[elem],400,ypp);
+		     else
+			mover(&hanoi[elem],400,ypp);
 
-    }
+		}
+		else if ( pp1==2 && pp2==1)
+		{
+		    if(ap1>ap2)
+			mover(&hanoi[elem],-200,ypp);
+		    else
+			mover(&hanoi[elem],-200,ypp);
+		}
+		else if ( pp1==2 && pp2==3)
+		{
+		     if(ap1>ap2)
+			mover(&hanoi[elem],200,ypp);
+		     else
+			mover(&hanoi[elem],200,ypp);
+		}
+		else if ( pp1==3 && pp2==1)
+		{
+		     if(ap1>ap2)
+			mover(&hanoi[elem],-400,ypp);
+		     else
+			mover(&hanoi[elem],-400,ypp);
+		}
+		else if ( pp1==3 && pp2==2)
+		{
+		     if(ap1>ap2)
+			mover(&hanoi[elem],-200,ypp);
+		     else
+			mover(&hanoi[elem],-200,ypp);
+		}
+		//rdisc(hanoi);
+    //}
 }
-
+void hannoi(disco * hanoi,pals * plll, stck * p1, stck * p2,stck * p3,int n);
 void main()
 {
     int gd=DETECT,gm,i,j,n=5;
@@ -119,21 +177,25 @@ void main()
 	cdisc(&hanoi[i]);
 	ins(plll->st1,i);
     }
-    movp(hanoi,plll,plll->st1,plll->st2);
+    //movp(hanoi,plll,plll->st1,plll->st3);
+    //movp(hanoi,plll,plll->st1,plll->st2);
+    getch();
+    hannoi(hanoi,plll,plll->st1,plll->st2,plll->st3,n);
     getch();
 }
 
-void hannoi(void)
+void hannoi(disco * hanoi,pals * plll, stck * p1, stck * p2,stck * p3,int n)
 {
-    int i, n;
     if(n==1)
     {
-	//movp
+	movp(hanoi,plll,p1,p3);
+	getch();
     }
     else
     {
-	//hannoi
-	//movp
-	//hannoi
+	hannoi(hanoi,plll,p1,p3,p2,n-1);
+	movp(hanoi,plll,p1,p3);
+	getch();
+	hannoi(hanoi,plll,p2,p1,p3,n-1);
     }
 }
